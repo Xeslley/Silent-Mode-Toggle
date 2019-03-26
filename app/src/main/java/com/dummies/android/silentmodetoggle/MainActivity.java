@@ -1,10 +1,14 @@
 package com.dummies.android.silentmodetoggle;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -14,6 +18,7 @@ public class MainActivity extends AppCompatActivity {
     /**A variavel private AudioManager no nivel da classe. com isso podemos ter acesso a ela em outras partes da activity*/
     private AudioManager mAudioManager;
     private boolean mPhoneIsSilent;
+    private static final String LOG_TAG= "SilentModeApp";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
         /**Metodo para configurar o "event listener" do botao*/
         setButtonClickListener();
 
+        Log.d(LOG_TAG,"This is a test");
 
     }
 
@@ -39,13 +45,24 @@ public class MainActivity extends AppCompatActivity {
         toggleButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if(mPhoneIsSilent){
-                    //mude para normal
-                    mAudioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-                    mPhoneIsSilent = false;
+                    try {
+                        //mude para normal
+                        mAudioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+                        mPhoneIsSilent = false;
+                    }catch (SecurityException e){
+                        Intent PermitionIntent = new Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
+                        startActivity(PermitionIntent);
+                        Log.d(LOG_TAG,"");
+                    }
                 }else{
-                    //mude para silencioso
-                    mAudioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-                    mPhoneIsSilent = true;
+                    try {
+                        //mude para silencioso
+                        mAudioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+                        mPhoneIsSilent = true;
+                    }catch (SecurityException e){
+                        Intent PermitionIntent = new Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
+                        startActivity(PermitionIntent);
+                    }
                 }
                 //muda a UI
                 toggleUI();
